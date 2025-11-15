@@ -36,7 +36,7 @@ def draw():
     screen.clear()
     screen.fill("orange")
     screen.draw.filled_rect(mbox,"blue")
-    screen.draw.filled_rect(qbox,"red")
+    screen.draw.filled_rect(qbox,"black")
     screen.draw.filled_rect(tbox,"green")
     screen.draw.filled_rect(sbox,"white")
     for i in abox:
@@ -66,5 +66,57 @@ def readquestion():
         ques.append(i)
         count+=1
     qfile.close()
+
+def next_question():
+    global index 
+    index+=1 
+    return ques.pop(0).split(",")
+    
+def on_mouse_down(pos):
+    ix=1
+    for i in abox:
+        if i.collidepoint(pos):
+            if ix is int(q[5]):     
+                correct_answer()
+            else:
+                gameover()
+        ix+=1
+    if sbox.collidepoint(pos):
+        skipquestion()
+
+def correct_answer():
+    global score, q, time_left, ques
+    score+=1
+    if ques:
+        q=next_question()
+        time_left=10
+    else:
+        gameover()
+
+def skipquestion():
+    global q, time_left
+    if ques and not game_over:
+        q= next_question()  
+        time_left=10
+    else:
+        gameover()
+        
+def gameover():
+    global q, time_left, game_over
+    message = f"game over you got {score} questions correct" 
+    q = [message,"-","-","-","-",5]
+    time_left=0
+    game_over= True
+
+def updatetimeleft():
+    global time_left
+    if time_left:
+        time_left-=1
+    else:
+        gameover()
+
+readquestion()
+q = next_question()
+clock.schedule_interval(updatetimeleft,1)
 
 pgzrun.go()
